@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "openai_playground"
+version = "0.1.0"
+description = ""
+authors = ["kimkim <nkimura2021infotech@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+python-dotenv = "^1.0.1"
+openai = "^1.14.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
