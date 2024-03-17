@@ -1,10 +1,22 @@
-from azure.cosmos import CosmosClient, PartitionKey
+# -*- coding: utf-8 -*-
+"""
+
+CosmosDBとの接続およびデータの操作を行うモジュール。
+
+"""
 import os
-import uuid
-from openai.types.chat.chat_completion import ChatCompletionMessage
+
+from azure.cosmos import CosmosClient, PartitionKey, ContainerProxy
 
 
-def upsert_conversation(messages: list, thread):
+def get_container_client() -> ContainerProxy:
+    """
+
+    CosmosDBのcontainerクライアントを取得する。
+
+    Returns: ContainerProxy
+
+    """
     HOST = os.getenv('COSMOS_HOST')
     COSMOS_ACCOUNT_KEY = os.getenv('COSMOS_ACCOUNT_KEY')
     COSMOS_DATABASE_ID = os.getenv('COSMOS_DATABASE_ID')
@@ -23,17 +35,31 @@ def upsert_conversation(messages: list, thread):
 
     # Get database and container client
     db = client.get_database_client(database_name)
-    container = db.get_container_client(container_name)
+    return db.get_container_client(container_name)
 
-    # Create conversation history object
-    new_conversation = {
+
+def upsert_conversation(thread) -> None:
+    """
+
+    会話履歴をUpsertする。
+
+    Args:
+        thread: ConversationThreadオブジェクト
+
+    Returns: None
+
+    """
+    container = get_container_client()
+
+    # Create thread detail object
+    thread_detail = {
         "id": str(thread.id),
-        "user_id": thread.user_id,
-        "messages": str(messages)
+        "user_id": str(thread.user_id),
+        "messages": str(thread.messages)
     }
 
     try:
-        upserted_item = container.upsert_item(new_conversation)
+        upserted_item = container.upsert_item(thread_detail)
         print(f"Upserted conversation detail with ID: {upserted_item['id']}")
     except Exception as e:
         print(f"Error upserting conversation: {str(e)}")

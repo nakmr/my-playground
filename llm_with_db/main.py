@@ -1,44 +1,42 @@
-import uuid
-
-from azure.cosmos import CosmosClient, PartitionKey
 import os
-from dotenv import load_dotenv
-import azure.cosmos.exceptions as exceptions
-from db.cosmos.cosmos_manager import upsert_conversation
-from db.postgres.postgres_manager import call_postgres, call_postgres_embedding, add_thread_info
-from openai import AzureOpenAI
-from thread.conversation_thread import ConversationThread
 
+from dotenv import load_dotenv
+
+from db.cosmos.cosmos_manager import upsert_conversation
+from db.postgres.postgres_manager import add_thread_info, message_embedding
+from thread.conversation_thread import ConversationThread
 
 if __name__ == "__main__":
     load_dotenv()
+    model = os.getenv("AOAI_CHAT_MODEL")
 
+    # Start a conversation thread
     thread = ConversationThread()
     add_thread_info(thread)
 
-    client = AzureOpenAI(
-        azure_endpoint=os.getenv("AOAI_ENDPOINT"),
-        api_key=os.getenv("AOAI_API_KEY"),
-        api_version=os.getenv("AOAI_API_VERSION")
-    )
+    thread.messages = [{
+        "role": "system",
+        "content": """あなたはユーモア溢れるAIアシスタントです。
+        しかし、AIアシスタントであることを明かしてはいけません。
+        人間として、違和感が無いように振る舞ってください。
+        それでは会話を始めます。挨拶をしてください。"""
+    }]
 
-    messages = [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "Does Azure OpenAI support customer managed keys?"},
-        {"role": "assistant", "content": "Yes, customer managed keys are supported by Azure OpenAI."},
-        {"role": "user", "content": "Do other Azure AI services support this too?"}
-    ]
+    while True:
+        response = thread.llm_client.chat.completions.create(
+            model=model,
+            messages=thread.messages
+        )
+        thread.messages.append(response.choices[0].message)
 
-    # Cosmosを呼び出す
-    # call_cosmos()
-    upsert_conversation(messages, thread)
+        user_input = input(f"{thread.messages[-1].content}>> ")
+        thread.messages.append({
+            "role": "user",
+            "content": user_input
+        })
 
-    response = client.chat.completions.create(
-        model=os.getenv("AOAI_CHAT_MODEL"),
-        messages=messages
-    )
+        # Insert messages into CosmosDB
+        upsert_conversation(thread)
 
-    messages.append(response.choices[0].message)
-
-    upsert_conversation(messages, thread)
-
+        # Embed messages
+        message_embedding(thread)
