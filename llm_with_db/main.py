@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 import azure.cosmos.exceptions as exceptions
 from db.cosmos.cosmos_manager import call_cosmos
-from db.postgres.postgres_manager import call_postgres
+from db.postgres.postgres_manager import call_postgres, call_postgres_embedding
 
 
 if __name__ == "__main__":
@@ -13,4 +13,5 @@ if __name__ == "__main__":
     # call_cosmos()
 
     # Postgresを呼び出す
-    call_postgres()
+    # call_postgres()
+    call_postgres_embedding()
