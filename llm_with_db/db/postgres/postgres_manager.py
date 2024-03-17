@@ -2,6 +2,48 @@ import os
 
 import psycopg2
 
+
+def add_thread_info(thread):
+    HOST = os.getenv('PG_HOST')
+    USER = os.getenv('PG_USER')
+    PASSWORD = os.getenv('PG_PASSWORD')
+    PORT = os.getenv('PG_PORT')
+    DB_NAME = os.getenv('PG_DATABASE')
+
+    # Connect to DB
+    database_url = f"host={HOST} port={PORT} dbname={DB_NAME} user={USER} password={PASSWORD}"
+    conn = psycopg2.connect(database_url)
+    cursor = conn.cursor()
+
+    cursor.execute("DROP TABLE IF EXISTS thread_info")
+
+    # Create table
+    CREATE_TABLE_QUERY = f"""
+        CREATE TABLE thread_info (
+            thread_id VARCHAR(50) PRIMARY KEY,
+            user_id VARCHAR(50),
+            thread_embedding vector(1536)
+        );"""
+    cursor.execute(CREATE_TABLE_QUERY)
+
+    # Insert thread info
+    INSERT_THREAD_INFO_QUERY = f"""
+        INSERT INTO thread_info (
+            thread_id, user_id
+        )
+        VALUES (
+            '{thread.id}',
+            '{thread.user_id}'
+        )
+    """
+    cursor.execute(INSERT_THREAD_INFO_QUERY)
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+
+
 def call_postgres():
     HOST = os.getenv('PG_HOST')
     USER = os.getenv('PG_USER')
