@@ -7,6 +7,12 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
+zope-interface = "^6.2"
+mypy = "^1.9.0"
+redis = "^5.0.3"
+flask = "^3.0.2"
+injector = "^0.21.0"
+flask-injector = "^0.15.0"
 
 
 [build-system]
