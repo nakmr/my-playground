@@ -3,3 +3,7 @@
 __pycache__/
 
 .env
+
+# llamaindex
+llamaindex/notebook/*.db
+llamaindex/notebook/*.zip

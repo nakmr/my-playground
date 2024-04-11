@@ -1,16 +1,17 @@
 [tool.poetry]
-name = "my-playground"
+name = "llamaindex"
 version = "0.1.0"
 description = ""
 authors = ["kimkim <nkimura2021infotech@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.12"
+llama-index = "^0.10.28"
 jupyter = "^1.0.0"
+python-dotenv = "^1.0.1"
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
