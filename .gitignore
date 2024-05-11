@@ -5,5 +5,11 @@ __pycache__/
 .env
 
 # llamaindex
-llamaindex/notebook/*.db
-llamaindex/notebook/*.zip
+llamaindex/notebook/*
+llamaindex/data/*
+!llamaindex/notebook/*.ipynb
+
+# terraform
+.terraform/
+*.tfstate
+*.tfstate.*

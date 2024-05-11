@@ -6,11 +6,13 @@ authors = ["kimkim <nkimura2021infotech@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = ">=3.12, <3.13"
 llama-index = "^0.10.28"
 jupyter = "^1.0.0"
 python-dotenv = "^1.0.1"
 pyvis = "^0.3.2"
+arize-phoenix = "^3.21.0"
+opentelemetry-exporter-otlp = ">=1.21.0"
 
 
 [build-system]
