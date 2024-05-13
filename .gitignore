@@ -13,3 +13,9 @@ llamaindex/data/*
 .terraform/
 *.tfstate
 *.tfstate.*
+
+# openai_playground
+openai_playground/azure/inference.json
+
+# ms_learn
+ms_learn/*

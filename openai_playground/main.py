@@ -1,15 +1,21 @@
 import os
 from dotenv import load_dotenv
-from openai import OpenAI
+from openai import OpenAI, AzureOpenAI
 
 load_dotenv()
 
-client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY")
+# client = OpenAI(
+#     api_key=os.getenv("OPENAI_API_KEY")
+# )
+
+client = AzureOpenAI(
+    api_key=os.getenv("AZURE_OPENAI_API_KEY"),  
+    api_version=os.getenv("AZURE_API_VERSION"),
+    azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT")
 )
 
 completion = client.chat.completions.create(
-    model=os.getenv("CHAT_MODEL_GPT35"),
+    model=os.getenv("AZURE_OPENAI_CHAT_MODEL_GPT35"),
     messages=[
         {
             "role": "system",
