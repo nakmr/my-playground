@@ -18,4 +18,4 @@ llamaindex/data/*
 openai_playground/azure/inference.json
 
 # ms_learn
-ms_learn/*
+ms_learn/apim_commands
