@@ -85,6 +85,7 @@ def call_chat(message: str, messages: list) -> str:
     return completion.choices[0].message.content
 
 api = APIRouter(prefix="/slack")
+
 @api.get("/test")
 async def test_endpoint():
     return {"message": "Working!"}

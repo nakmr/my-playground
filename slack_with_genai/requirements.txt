@@ -2,5 +2,4 @@ fastapi
 uvicorn[standard]
 gunicorn
 slack_bolt
-slack_sdk
 openai
