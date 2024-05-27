@@ -1,40 +1,22 @@
 import os
-from dotenv import load_dotenv
 import logging
 
+from fastapi import APIRouter, Request, Response
 from slack_bolt import App
-from slack_bolt.adapter.socket_mode import SocketModeHandler
-from openai import OpenAI
+from slack_bolt.adapter.fastapi import SlackRequestHandler
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
+from openai import OpenAI
 
-# ロギングの設定
 logging.basicConfig(level=logging.INFO)
 
-load_dotenv()
-
-# Appの初期化
 app = App(
     token=os.getenv("SLACK_BOT_TOKEN"),
     signing_secret=os.getenv("SLACK_SIGNING_SECRET")
 )
+app_handler = SlackRequestHandler(app=app)
 
 client = WebClient(token=os.getenv("SLACK_BOT_TOKEN"))
-
-@app.event("app_mention")
-def mention_handler(body, say):
-    mention = body['event']
-    text = mention['text']
-    channel = mention['channel']
-    thread_ts = mention.get('thread_ts', mention['ts'])
-    user = mention['user']
-
-    # スレッドのメッセージ履歴を取得
-    messages = get_thread_history(channel, thread_ts)
-    response = call_chat(text, messages)
-    response_body = f"<@{user}> {response}"
-
-    say(text=response_body, channel=channel, thread_ts=thread_ts)
 
 @app.event("message")
 def message_handler(body, say):
@@ -45,7 +27,7 @@ def message_handler(body, say):
     thread_ts = event.get('thread_ts', event['ts'])
 
     # Botからのメッセージを無視
-    if user == bot_user_id:
+    if user == client.auth_test()['user_id']:
         return
 
     # スレッドのメッセージ履歴を取得
@@ -102,8 +84,12 @@ def call_chat(message: str, messages: list) -> str:
 
     return completion.choices[0].message.content
 
-if __name__ == "__main__":
-    # BotユーザーIDを取得
-    bot_user_id = client.auth_test()['user_id']
-    
-    app.start(port=int(os.getenv("PORT", 3000)))
+api = APIRouter(prefix="/slack")
+@api.get("/test")
+async def test_endpoint():
+    return {"message": "Working!"}
+
+@api.post("/events", name="slack events")
+async def events(request: Request) -> Response:
+    return await app_handler.handle(request)
+
