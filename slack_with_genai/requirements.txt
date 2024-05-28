@@ -3,3 +3,4 @@ uvicorn[standard]
 gunicorn
 slack_bolt
 openai
+requests

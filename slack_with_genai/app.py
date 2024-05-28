@@ -1,6 +1,8 @@
 import os
 import logging
-
+import re
+import json
+import requests
 from fastapi import APIRouter, Request, Response
 from slack_bolt import App
 from slack_bolt.adapter.fastapi import SlackRequestHandler
@@ -18,8 +20,12 @@ app_handler = SlackRequestHandler(app=app)
 
 client = WebClient(token=os.getenv("SLACK_BOT_TOKEN"))
 
+# グローバル変数の初期化
+prievious_conversation_id = ""
+
 @app.event("message")
 def message_handler(body, say):
+    global prievious_conversation_id  # グローバル変数として宣言
     event = body['event']
     text = event['text']
     channel = event['channel']
@@ -30,10 +36,9 @@ def message_handler(body, say):
     if user == client.auth_test()['user_id']:
         return
 
-    # スレッドのメッセージ履歴を取得
-    messages = get_thread_history(channel, thread_ts)
-    response = call_chat(text, messages)
-    response_body = f"{response}"
+    response = call_dify(query=text, user=user, conversation_id=prievious_conversation_id)
+    prievious_conversation_id = response.json().get("conversation_id")  # グローバル変数を更新
+    response_body = response.json().get("answer")
 
     say(text=response_body, channel=channel, thread_ts=thread_ts)
 
@@ -51,7 +56,7 @@ client_openai = OpenAI(
     api_key=os.getenv("OPENAI_API_KEY")
 )
 
-def call_chat(message: str, messages: list) -> str:
+def call_chat(messages: list) -> str:
     # スレッドのメッセージ履歴をフォーマット
     conversation = []
     for msg in messages:
@@ -59,11 +64,6 @@ def call_chat(message: str, messages: list) -> str:
         # MemberID でフィルタ
         role = "assistant" if msg['user'] == "U06JCGQGUMA" else "user"
         conversation.append({"role": role, "content": msg['text']})
-    
-    # conversation.append({
-    #     "role": "user",
-    #     "content": message
-    # })
 
     # ロギング
     logging.info("Sending the following messages to OpenAI:")
@@ -94,3 +94,20 @@ async def test_endpoint():
 async def events(request: Request) -> Response:
     return await app_handler.handle(request)
 
+def call_dify(query: str, user: str, conversation_id: str):
+    url = os.getenv("DIFY_CHAT_ENDPOINT")
+
+    headers = {
+        'Authorization': f'Bearer {os.getenv("DIFY_API_KEY")}',
+        'Content-Type': 'application/json',
+    }
+
+    data = {
+        "inputs": {},
+        "query": query,
+        "response_mode": "blocking",
+        "conversation_id": conversation_id,
+        "user": user
+    }
+    response = requests.post(url, headers=headers, data=json.dumps(data))
+    return response
