@@ -21,3 +21,6 @@ openai_playground/azure/inference.json
 
 # ms_learn
 ms_learn/apim_commands
+
+# slack_with_genai
+starter.sh
