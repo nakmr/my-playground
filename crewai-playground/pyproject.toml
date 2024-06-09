@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "crewai-playground"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.12,<3.13"
+crewai = {extras = ["tools"], version = "^0.30.11"}
+python-dotenv = "^1.0.1"
+duckduckgo-search = "^6.1.5"
+unstructured = "^0.14.5"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
