@@ -1,6 +1,8 @@
 from crewai import Agent
 from tools import BrowserTool, CalculatorTool, SearchTool
+from dotenv import load_dotenv
 
+load_dotenv("./.env")
 
 class TripAgents:
 

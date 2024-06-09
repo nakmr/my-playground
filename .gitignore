@@ -24,3 +24,6 @@ ms_learn/apim_commands
 
 # slack_with_genai
 starter.sh
+
+# crewai-server-demo
+crewai-playground/crewai-server-demo/crewai-stuff/*.md

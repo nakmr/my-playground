@@ -5,7 +5,7 @@ from crewai import Crew, Process
 from dotenv import load_dotenv
 from tasks import TripTasks
 
-load_dotenv("../.env")
+load_dotenv("./.env")
 
 
 class TripCrew:
