@@ -1,0 +1,12 @@
+@url = http://localhost:8000
+
+POST {{url}}/chat
+Content-Type: application/json
+
+{
+    "prompt": "メッセージ届いてる？"
+}
+
+###
+GET {{url}}
+
